@@ -29,13 +29,11 @@ data:
     session_redis = redis:6379:0
     cache_store = redis
     cache_redis = redis:6379:1
-    # WebSocket improvements
-    proxy_buffering = off
-    proxy_connect_timeout = 3600
-    proxy_read_timeout = 3600
-    proxy_send_timeout = 3600
-    longpolling_port = 8072
-    #longpolling_port = False
-    gevent_port = 8072
-    vapid_private_key = MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgUQIBEMlY6_LXYRfy_a2mMA2eBoivHQABgKkX9BwS32OhRANCAASfKfRVPO7w6VPhXwqXXJpDNm9f8RQTTzyiOq1CjZ1m7Wn0w2Pfj1htpNTKwQPj9APue_AxpZT0VjDAjpuFjZ9e
-    vapid_public_key = BJ8p9FU87vDpU_FfCpdcmkM2b1_xFBNPPKI6rUKNnWbtafTDY9_PWG2k1MrBA_P0A_574DGllPRWMMCOm4WNn14=
+    # # WebSocket improvements
+    # proxy_buffering = off
+    # proxy_connect_timeout = 3600
+    # proxy_read_timeout = 3600
+    # proxy_send_timeout = 3600
+    # longpolling_port = 8072
+    # #longpolling_port = False
+    # gevent_port = 8072
