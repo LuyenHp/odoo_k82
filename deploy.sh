@@ -33,8 +33,7 @@ sleep 20
 # Triển khai Odoo
 kubectl apply -f application/odoo-deployment-update.yaml
 kubectl apply -f application/odoo-service.yaml
-#kebectl apply -f services/odoo-service-update.yaml
-#kubectl apply -f ingress.yaml
+
 # Kiểm tra triển khai
 echo "Triển khai hoàn tất. Kiểm tra trạng thái..."
 kubectl get all -n odoo-system
