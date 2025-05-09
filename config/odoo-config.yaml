@@ -37,3 +37,6 @@ data:
     longpolling_port = 8072
     #longpolling_port = False
     gevent_port = 8072
+    # VAPID keys
+    vapid_private_key = MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgUQIBEMlY6/LXYRfy+a2mMA2eBoivHQBbgKkX9BwS32OhRANCAASfKfRVPO7w6VPhXwqXXJpDNm9f8RQTTzyiOq1CjZ1m7Wn0w2Pfj1htpNTKwQPj9APue+AxpZT0VjDAjpuFjZ9e
+    vapid_public_key = BJ8p9FU87vDpU+FfCpdcmkM2b1/xFBNPPKI6rUKNnWbtafTDY9+PWG2k1MrBA+P0A+574DGllPRWMMCOm4WNn14=
