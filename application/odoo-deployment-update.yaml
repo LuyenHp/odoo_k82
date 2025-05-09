@@ -101,7 +101,7 @@ spec:
         volumeMounts:
         - name: odoo-data
           mountPath: /var/lib/odoo
-        - name: odoo-config
+        - name: odoo-config-writable
           mountPath: /etc/odoo
         - name: local-image-storage
           mountPath: /mnt/local_image_storage
