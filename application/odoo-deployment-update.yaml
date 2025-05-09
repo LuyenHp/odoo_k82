@@ -40,6 +40,16 @@ spec:
         - containerPort: 8072
           name: odoo-chat
         env:
+        - name: SITE_URL
+          value: "https://weldcom.mayhanthongminh.com"  # Đảm bảo trùng khớp với tên miền của bạn
+        - name: WEB_BASE_URL
+          value: "https://weldcom.mayhanthongminh.com"  # Xác định rõ URL base
+        - name: PROXY_MODE
+          value: "True"
+        - name: WEBSITE_HOST
+          value: "weldcom.mayhanthongminh.com"
+        - name: TRUST_PROXY_HEADERS
+          value: "True"
         - name: REDIS_HOST
           value: "redis"
         - name: REDIS_PORT

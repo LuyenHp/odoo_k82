@@ -15,26 +15,39 @@ data:
     db_password = admin
     db_name = odoo
     db_template = template0
+    
+    # Proxy config quan trọng cho Cloudflared
     proxy_mode = True
-    limit_request = 8192
-    limit_memory_soft = 2147483648
-    limit_memory_hard = 2684354560
-    #workers = 4 khi có worker sẽ lỗi socket chuyển sang dùng max_cron...
-    max_cron_threads = 2
-    # Tăng số luồng cron để cải thiện hiệu suất background
-    without_demo = True
-    list_db = True
+    proxy_buffering = off
+    proxy_connect_timeout = 3600
+    proxy_read_timeout = 3600
+    proxy_send_timeout = 3600
+    
+    # Đặt URL cố định cho hệ thống
+    web_base_url = https://weldcom.mayhanthongminh.com
+    
+    # Thiết lập các header security
+    trust_x_forwarded = True
+    secure_hsts_header = True
+    cors_origin = https://weldcom.mayhanthongminh.com
+    
+    # WebSocket config
+    gevent_port = 8072
+    longpolling_port = 8072
+    websocket_keep_alive_timeout = 600
+    websocket_rate_limit_burst = 30
+    websocket_rate_limit_delay = 10
+    
     # Redis configuration
     session_store = redis
     session_redis = redis:6379:0
     cache_store = redis
     cache_redis = redis:6379:1
-    # WebSocket improvements
-    proxy_buffering = off
-    proxy_connect_timeout = 3600
-    proxy_read_timeout = 3600
-    proxy_send_timeout = 3600
-    longpolling_port = 8072
-    #longpolling_port = False
-    gevent_port = 8072
     
+    # Các cài đặt khác
+    without_demo = True
+    list_db = True
+    limit_request = 8192
+    limit_memory_soft = 2147483648
+    limit_memory_hard = 2684354560
+    max_cron_threads = 2
