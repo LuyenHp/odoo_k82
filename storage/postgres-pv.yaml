@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv
+  namespace: odoo-system
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ceph-rbd
+  rbd:
+    monitors:
+    - 192.168.1.11:6789
+    - 192.168.1.12:6789
+    - 192.168.1.13:6789
+    pool: kubernetes
+    image: postgres-data
+    user: admin
+    secretRef:
+      name: ceph-admin-secret
+      namespace: odoo-system
+    fsType: ext4
+    readOnly: false

@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: odoo
+  namespace: odoo-system
+  labels:
+    app: odoo
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: odoo
+  template:
+    metadata:
+      labels:
+        app: odoo
+    spec:
+      securityContext:
+        fsGroup: 101
+        runAsUser: 101
+        runAsGroup: 101
+      initContainers:
+      - name: init-permissions
+        image: busybox
+        securityContext:
+          runAsUser: 0
+        command: ['sh', '-c', 'mkdir -p /mnt/local_image_storage && chown -R 101:101 /mnt/local_image_storage && chmod -R 755 /mnt/local_image_storage']
+        volumeMounts:
+        - name: local-image-storage
+          mountPath: /mnt/local_image_storage
+      containers:
+      - name: odoo
+        image: mayhanthongminh/odoo-amd64:18.11
+        command: ["odoo", "--config=/etc/odoo/odoo.conf","-i","base"]
+        ports:
+        - containerPort: 8069
+          name: odoo-web
+        - containerPort: 8072
+          name: odoo-chat
+        env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: db-password
+              name: odoo-secrets
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: admin-password
+              name: odoo-secrets
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: redis_password
+              name: odoo-secrets
+        - name: HOST
+          value: postgres
+        - name: USER
+          value: odoo
+        - name: DB_HOST
+          value: postgres
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USER
+          value: odoo
+        - name: DB_NAME
+          value: odoo
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "1000m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        volumeMounts:
+        - name: odoo-data
+          mountPath: /var/lib/odoo
+        - name: odoo-config
+          mountPath: /etc/odoo
+        - name: local-image-storage
+          mountPath: /mnt/local_image_storage
+        # Uncomment nếu bạn muốn mount thư mục addons
+        # - name: odoo-addons
+        #   mountPath: /mnt/extra-addons
+        readinessProbe:
+          httpGet:
+            path: /web/health
+            port: 8069
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /web/health
+            port: 8069
+          initialDelaySeconds: 60
+          periodSeconds: 20
+          timeoutSeconds: 5
+      volumes:
+      - name: odoo-data
+        persistentVolumeClaim:
+          claimName: odoo-pvc
+      - name: odoo-config
+        configMap:
+          name: odoo-config
+      - name: local-image-storage
+        persistentVolumeClaim:
+          claimName: local-image-storage-pvc
+      # Uncomment nếu bạn muốn sử dụng volume addons
+      # - name: odoo-addons
+      #   emptyDir: {}
