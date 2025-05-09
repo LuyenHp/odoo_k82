@@ -40,6 +40,10 @@ spec:
         - containerPort: 8072
           name: odoo-chat
         env:
+        - name: REDIS_HOST
+          value: "redis"
+        - name: REDIS_PORT
+          value: "6379" 
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
