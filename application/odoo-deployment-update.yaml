@@ -30,6 +30,16 @@ spec:
         volumeMounts:
         - name: local-image-storage
           mountPath: /mnt/local_image_storage
+      - name: init-config
+        image: busybox
+        securityContext:
+          runAsUser: 0
+        command: ['sh', '-c', 'mkdir -p /tmp/odoo && cp /etc/odoo-readonly/odoo.conf /tmp/odoo/ && chmod 644 /tmp/odoo/odoo.conf && chown 101:101 /tmp/odoo/odoo.conf']
+        volumeMounts:
+        - name: odoo-config-readonly
+          mountPath: /etc/odoo-readonly
+        - name: odoo-config-writable
+          mountPath: /tmp/odoo
       containers:
       - name: odoo
         image: mayhanthongminh/odoo-amd64:18.11
@@ -116,9 +126,11 @@ spec:
       - name: odoo-data
         persistentVolumeClaim:
           claimName: odoo-pvc
-      - name: odoo-config
+      - name: odoo-config-readonly
         configMap:
           name: odoo-config
+      - name: odoo-config-writable
+        emptyDir: {}
       - name: local-image-storage
         persistentVolumeClaim:
           claimName: local-image-storage-pvc
