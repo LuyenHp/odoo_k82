@@ -48,6 +48,6 @@ data:
     without_demo = True
     list_db = True
     limit_request = 8192
-    limit_memory_soft = 2147483648
-    limit_memory_hard = 2684354560
-    max_cron_threads = 2
+    limit_memory_soft = 6039797760
+    limit_memory_hard = 7247757312
+    max_cron_threads = 4
