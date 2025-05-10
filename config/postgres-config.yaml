@@ -6,7 +6,8 @@ metadata:
 data:
   postgresql.conf: |
     # Kết nối và xác thực - PostgreSQL 17
-    max_connections = 200                
+    max_connections = 200
+    listen_addresses = '*'                
     # Phù hợp cho 50 người dùng đồng thời
     shared_buffers = 1GB                 
     # Khoảng 25% RAM của container
