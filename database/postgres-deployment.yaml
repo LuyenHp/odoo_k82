@@ -31,18 +31,32 @@ spec:
             secretKeyRef:
               name: odoo-secrets
               key: db-password
+        # Thêm biến môi trường để sử dụng file cấu hình tùy chỉnh
+        - name: POSTGRES_INITDB_ARGS
+          value: "--data-checksums"
         volumeMounts:
         - name: postgres-data
           mountPath: /var/lib/postgresql/data
           subPath: pgdata
+        - name: postgres-config
+          mountPath: /etc/postgresql/postgresql.conf
+          subPath: postgresql.conf
+        # Thêm tham số khi khởi động PostgreSQL
+        command:
+        - "postgres"
+        - "-c"
+        - "config_file=/etc/postgresql/postgresql.conf"
         resources:
           requests:
-            memory: "1024Mi"
-            cpu: "1000m"
-          limits:
             memory: "1Gi"
             cpu: "1000m"
+          limits:
+            memory: "2Gi"
+            cpu: "1500m"
       volumes:
       - name: postgres-data
         persistentVolumeClaim:
           claimName: postgres-pvc
+      - name: postgres-config
+        configMap:
+          name: postgres-config
