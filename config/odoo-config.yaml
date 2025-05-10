@@ -46,7 +46,7 @@ data:
     
     # Các cài đặt khác
     without_demo = True
-    list_db = False
+    list_db = True
     limit_request = 8192
     limit_memory_soft = 6039797760
     limit_memory_hard = 7247757312
