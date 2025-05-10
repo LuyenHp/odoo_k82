@@ -19,27 +19,6 @@ spec:
       containers:
       - name: postgres
         image: postgres:17
-        securityContext:
-          runAsUser: 999
-          runAsGroup: 999
-        command:
-        - "bash" 
-        - "-c"
-        - |
-          # Đợi thư mục dữ liệu PostgreSQL được khởi tạo
-          until [ -f /var/lib/postgresql/data/PG_VERSION ]; do
-            echo "Waiting for PostgreSQL data directory to be initialized..."
-            sleep 1
-          done
-          
-          # Tạo thư mục cấu hình nếu cần
-          mkdir -p /var/lib/postgresql/data/pg_log
-          
-          # Sao chép cấu hình
-          cp /postgresql-config/postgresql.conf /var/lib/postgresql/data/postgresql.conf
-          
-          # Khởi động PostgreSQL với cấu hình tùy chỉnh
-          postgres -c "config_file=/var/lib/postgresql/data/postgresql.conf"
         ports:
         - containerPort: 5432
         env:
@@ -52,27 +31,18 @@ spec:
             secretKeyRef:
               name: odoo-secrets
               key: db-password
-        - name: POSTGRES_HOST_AUTH_METHOD
-          value: "md5"
-        # Thêm biến môi trường để lắng nghe tất cả các địa chỉ
-        - name: POSTGRES_LISTEN_ADDRESSES
-          value: "*"
         volumeMounts:
         - name: postgres-data
           mountPath: /var/lib/postgresql/data
-        - name: postgresql-config
-          mountPath: /postgresql-config
+          subPath: pgdata
         resources:
           requests:
-            memory: "1Gi"
+            memory: "1024Mi"
             cpu: "1000m"
           limits:
-            memory: "2Gi"
-            cpu: "1500m"
+            memory: "1Gi"
+            cpu: "1000m"
       volumes:
-      - name: postgresql-config
-        configMap:
-          name: postgres-config
       - name: postgres-data
         persistentVolumeClaim:
           claimName: postgres-pvc

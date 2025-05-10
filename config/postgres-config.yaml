@@ -80,6 +80,27 @@ data:
     enable_partitionwise_aggregate = on  
     # Tối ưu hóa cho bảng phân vùng
     
+    # Logging - quan trọng cho giám sát
+    logging_collector = on
+    log_directory = 'pg_log'
+    log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'
+    log_truncate_on_rotation = on
+    log_rotation_age = 1d
+    log_rotation_size = 100MB
+    log_min_duration_statement = 2000    
+    # Log các truy vấn chậm > 2 giây
+    log_checkpoints = on                 
+    # Log thông tin checkpoint
+    log_connections = on                 
+    # Log kết nối
+    log_disconnections = on              
+    # Log ngắt kết nối
+    log_lock_waits = on                  
+    # Log chờ khóa
+    
+    # Bảo mật
+    password_encryption = scram-sha-256  
+    # Phương thức mã hóa mật khẩu mạnh nhất
     
     # Tham số VACUUM - PostgreSQL 17 có cải tiến
     autovacuum = on
