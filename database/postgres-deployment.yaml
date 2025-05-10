@@ -15,10 +15,31 @@ spec:
         app: postgres
     spec:
       securityContext:
-        fsGroup: 999
+        fsGroup: 999  # PostgreSQL 17 vẫn sử dụng group 999
+      initContainers:
+      - name: init-postgres-dirs
+        image: busybox:latest
+        command:
+        - bash
+        - -c
+        - |
+          mkdir -p /var/lib/postgresql/data/pgdata/pg_log
+          chmod 700 /var/lib/postgresql/data/pgdata
+          chown -R 999:999 /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        securityContext:
+          runAsUser: 0
       containers:
       - name: postgres
-        image: postgres:17
+        image: postgres:17  # Sử dụng đúng phiên bản PostgreSQL 17
+        command:
+        - "bash"
+        - "-c"
+        - |
+          cp /postgresql-config/postgresql.conf /tmp/postgresql.conf
+          exec postgres -c config_file=/tmp/postgresql.conf
         ports:
         - containerPort: 5432
         env:
@@ -31,18 +52,57 @@ spec:
             secretKeyRef:
               name: odoo-secrets
               key: db-password
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - odoo
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - odoo
+          initialDelaySeconds: 45
+          periodSeconds: 15
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        startupProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - odoo
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 30
         volumeMounts:
         - name: postgres-data
           mountPath: /var/lib/postgresql/data
-          subPath: pgdata
+        - name: postgresql-config
+          mountPath: /postgresql-config
         resources:
           requests:
-            memory: "1024Mi"
-            cpu: "1000m"
+            memory: "2Gi"
+            cpu: "2000m"
           limits:
-            memory: "1Gi"
-            cpu: "1000m"
+            memory: "3Gi"
+            cpu: "2000m"
       volumes:
+      - name: postgresql-config
+        configMap:
+          name: postgres-config
       - name: postgres-data
         persistentVolumeClaim:
           claimName: postgres-pvc

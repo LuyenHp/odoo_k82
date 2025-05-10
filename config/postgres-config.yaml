@@ -1,0 +1,113 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: odoo-system
+data:
+  postgresql.conf: |
+    # Kết nối và xác thực - PostgreSQL 17
+    max_connections = 200                
+    # Phù hợp cho 50 người dùng đồng thời
+    shared_buffers = 1GB                 
+    # Khoảng 25% RAM của container
+    
+    # Tham số bộ nhớ - PostgreSQL 17
+    work_mem = 16MB                      
+    # Tăng từ giá trị mặc định (4MB)
+    maintenance_work_mem = 256MB         
+    # Tăng từ giá trị mặc định (64MB)
+    effective_cache_size = 2GB           
+    # Khoảng 50% tổng RAM
+    
+    # Kiểm soát Parallel Query - mới trong PostgreSQL 17
+    max_parallel_workers_per_gather = 4  
+    # Tăng song song cho truy vấn phức tạp
+    max_parallel_workers = 8             
+    # Tổng số worker song song
+    max_parallel_maintenance_workers = 4 
+    # Worker cho bảo trì
+    
+    # Optimization cho PostgreSQL 17
+    jit = on                             
+    # Just-In-Time compilation được cải thiện trong PG 17
+    jit_above_cost = 100000              
+    # Ngưỡng chi phí cho JIT
+    jit_inline_above_cost = 500000       
+    # Ngưỡng chi phí cho JIT inline
+    jit_optimize_above_cost = 500000     
+    # Ngưỡng chi phí cho JIT optimize
+    
+    # Kiểm soát checkpoint - được cải thiện trong PostgreSQL 17
+    checkpoint_timeout = 15min           
+    # Thời gian giữa các lần checkpoint tự động
+    max_wal_size = 1GB                   
+    # PostgreSQL 17 xử lý WAL hiệu quả hơn
+    min_wal_size = 80MB                  
+    # Giữ ít nhất bao nhiêu không gian WAL
+    checkpoint_completion_target = 0.9   
+    # Thời gian để hoàn thành checkpoint
+    
+    # Hiệu suất ghi - có thay đổi trong PostgreSQL 17
+    wal_level = replica                  
+    # Cần thiết cho sao lưu
+    synchronous_commit = on              
+    # Đảm bảo dữ liệu an toàn trong sản xuất
+    fsync = on                           
+    # Đảm bảo tính toàn vẹn dữ liệu
+    full_page_writes = on                
+    # Bảo vệ tránh mất dữ liệu khi lỗi hệ thống
+    
+    # Xử lý timeout - quan trọng cho Odoo 18
+    idle_in_transaction_session_timeout = 60000   
+    # 60 giây
+    statement_timeout = 300000                    
+    # 5 phút - cho phù hợp với xử lý báo cáo dài
+    lock_timeout = 60000                          
+    # 60 giây
+    
+    # Tham số TCP - quan trọng cho kết nối ổn định với Odoo
+    tcp_keepalives_idle = 60             
+    # Seconds before sending keepalive
+    tcp_keepalives_interval = 10         
+    # Seconds between keepalives
+    tcp_keepalives_count = 10            
+    # Max number of keepalives
+    
+    # Tối ưu hóa truy vấn - PostgreSQL 17 có cải tiến
+    enable_partitionwise_join = on       
+    # Tối ưu hóa cho bảng phân vùng
+    enable_partitionwise_aggregate = on  
+    # Tối ưu hóa cho bảng phân vùng
+    
+    # Logging - quan trọng cho giám sát
+    logging_collector = on
+    log_directory = 'pg_log'
+    log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'
+    log_truncate_on_rotation = on
+    log_rotation_age = 1d
+    log_rotation_size = 100MB
+    log_min_duration_statement = 2000    
+    # Log các truy vấn chậm > 2 giây
+    log_checkpoints = on                 
+    # Log thông tin checkpoint
+    log_connections = on                 
+    # Log kết nối
+    log_disconnections = on              
+    # Log ngắt kết nối
+    log_lock_waits = on                  
+    # Log chờ khóa
+    
+    # Bảo mật
+    password_encryption = scram-sha-256  
+    # Phương thức mã hóa mật khẩu mạnh nhất
+    
+    # Tham số VACUUM - PostgreSQL 17 có cải tiến
+    autovacuum = on
+    autovacuum_vacuum_scale_factor = 0.1 
+    # Trigger vacuum khi 10% tuple bị thay đổi
+    autovacuum_analyze_scale_factor = 0.05 
+    # Trigger analyze khi 5% tuple bị thay đổi
+    autovacuum_max_workers = 3           
+    # Số worker tối đa cho autovacuum
+    autovacuum_vacuum_cost_delay = 20ms  
+    # Delay giữa các vòng lặp autovacuum

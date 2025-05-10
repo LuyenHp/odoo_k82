@@ -21,6 +21,7 @@ kubectl apply -f redis/redis-service.yaml
 # Triển khai secrets và config
 kubectl apply -f secrets/odoo-secrets.yaml
 kubectl apply -f config/odoo-config.yaml
+kubectl apply -f config/postgres-config.yaml
 
 # Triển khai PostgreSQL
 kubectl apply -f database/postgres-deployment.yaml
