@@ -46,7 +46,7 @@ spec:
       containers:
       - name: odoo
         image: mayhanthongminh/odoo-amd64:18.12
-        command: ["odoo", "--config=/etc/odoo/odoo.conf","-i","base,l10n_vn,database_access_control"]
+        command: ["odoo", "--config=/etc/odoo/odoo.conf","-i","base,database_access_control"]
         ports:
         - containerPort: 8069
           name: odoo-web
