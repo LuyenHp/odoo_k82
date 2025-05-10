@@ -20,7 +20,7 @@ spec:
       - name: init-postgres-dirs
         image: busybox:latest
         command:
-        - bash
+        - sh
         - -c
         - |
           mkdir -p /var/lib/postgresql/data/pgdata/pg_log
