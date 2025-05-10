@@ -15,34 +15,31 @@ spec:
         app: postgres
     spec:
       securityContext:
-        fsGroup: 999  # PostgreSQL 17 vẫn sử dụng group 999
-      initContainers:
-      - name: init-postgres-dirs
-        image: busybox:latest
-        command:
-        - sh
-        - -c
-        - |
-          mkdir -p /var/lib/postgresql/data/pgdata/pg_log
-          chmod 700 /var/lib/postgresql/data/pgdata
-          chown -R 999:999 /var/lib/postgresql/data/pgdata
-        volumeMounts:
-        - name: postgres-data
-          mountPath: /var/lib/postgresql/data
-        securityContext:
-          runAsUser: 0
+        fsGroup: 999
       containers:
       - name: postgres
-        image: postgres:17  # Sử dụng đúng phiên bản PostgreSQL 17
-        securityContext:     # Thêm cấu hình này để chạy PostgreSQL với user postgres
-          runAsUser: 999     # User ID postgres
-          runAsGroup: 999    # Group ID postgres
+        image: postgres:17
+        securityContext:
+          runAsUser: 999
+          runAsGroup: 999
         command:
-        - "bash"
+        - "bash" 
         - "-c"
         - |
-          cp /postgresql-config/postgresql.conf /tmp/postgresql.conf
-          exec postgres -c config_file=/tmp/postgresql.conf
+          # Đợi thư mục dữ liệu PostgreSQL được khởi tạo
+          until [ -f /var/lib/postgresql/data/PG_VERSION ]; do
+            echo "Waiting for PostgreSQL data directory to be initialized..."
+            sleep 1
+          done
+          
+          # Tạo thư mục cấu hình nếu cần
+          mkdir -p /var/lib/postgresql/data/pg_log
+          
+          # Sao chép cấu hình
+          cp /postgresql-config/postgresql.conf /var/lib/postgresql/data/postgresql.conf
+          
+          # Khởi động PostgreSQL với cấu hình tùy chỉnh
+          postgres -c "config_file=/var/lib/postgresql/data/postgresql.conf"
         ports:
         - containerPort: 5432
         env:
@@ -55,41 +52,6 @@ spec:
             secretKeyRef:
               name: odoo-secrets
               key: db-password
-        - name: PGDATA
-          value: /var/lib/postgresql/data/pgdata
-        readinessProbe:
-          exec:
-            command:
-            - pg_isready
-            - -U
-            - odoo
-          initialDelaySeconds: 15
-          periodSeconds: 10
-          timeoutSeconds: 5
-          successThreshold: 1
-          failureThreshold: 3
-        livenessProbe:
-          exec:
-            command:
-            - pg_isready
-            - -U
-            - odoo
-          initialDelaySeconds: 45
-          periodSeconds: 15
-          timeoutSeconds: 5
-          successThreshold: 1
-          failureThreshold: 3
-        startupProbe:
-          exec:
-            command:
-            - pg_isready
-            - -U
-            - odoo
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          successThreshold: 1
-          failureThreshold: 30
         volumeMounts:
         - name: postgres-data
           mountPath: /var/lib/postgresql/data
@@ -97,10 +59,10 @@ spec:
           mountPath: /postgresql-config
         resources:
           requests:
-            memory: "2Gi"
+            memory: "1Gi"
             cpu: "1000m"
           limits:
-            memory: "3Gi"
+            memory: "2Gi"
             cpu: "1500m"
       volumes:
       - name: postgresql-config
